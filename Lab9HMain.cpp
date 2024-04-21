@@ -204,7 +204,6 @@ int main4(void){ uint32_t last=0,now;
 // ALL ST7735 OUTPUT MUST OCCUR IN MAIN
 
 
-
 int main5(void){ // final main
   __disable_irq();
   PLL_Init(); // set bus speed
@@ -226,8 +225,12 @@ int main5(void){ // final main
 
   while(1){
     // wait for semaphore
+      while(!input) {
+          input = Switch_In();
+      }
 
-       // clear semaphore
+
+
        // update ST7735R
     // check for end game or level switch
   }
