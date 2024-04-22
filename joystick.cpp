@@ -32,7 +32,7 @@ void ADC_INIT(void) {
 }
 
 // pass two reference values
-void ADC_INPUT(int &horizontal, int &vertical) {
+void ADC_INPUT(int *horizontal, int *vertical) {
 
     ADC0->ULLMEM.CTL0 |= 0x00000001;             // 1) enable conversions
     ADC0->ULLMEM.CTL1 |= 0x00000100;             // 2) start ADC
