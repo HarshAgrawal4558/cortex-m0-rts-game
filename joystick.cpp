@@ -38,8 +38,8 @@ void ADC_INPUT(int &horizontal, int &vertical) {
     ADC0->ULLMEM.CTL1 |= 0x00000100;             // 2) start ADC
     uint32_t volatile delay=ADC1->ULLMEM.STATUS; // 3) time to let ADC start
     while((ADC0->ULLMEM.STATUS&0x01)==0x01){}    // 4) wait for completion
-    horizontal = ADC0->ULLMEM.MEMRES[0];         // horizontal value passed to input
-    vertical = ADC0->ULLMEM.MEMRES[1];           // vertical value
+    *horizontal = ADC0->ULLMEM.MEMRES[0];         // horizontal value passed to input
+    *vertical = ADC0->ULLMEM.MEMRES[1];           // vertical value
 
 }
 
