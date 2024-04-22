@@ -7,8 +7,13 @@
 
 // horizontal pin: PA26
 // vertical pin: PA27
-
 // initializa ADC0, with channel 0 and 1 (PA26, PA27)
+
+#include "joystick.h"
+#include <ti/devices/msp/msp.h>
+#include "../inc/Clock.h"
+
+
 void ADC_INIT(void) {
 
     ADC0->ULLMEM.GPRCM.RSTCTL = 0xB1000003; // 1) reset
@@ -27,13 +32,13 @@ void ADC_INIT(void) {
 }
 
 // pass two reference values
-void ADC_HORIZONTAL(uint32_t &horizontal, uint32_t &vertical) {
+void ADC_INPUT(int &horizontal, int &vertical) {
 
     ADC0->ULLMEM.CTL0 |= 0x00000001;             // 1) enable conversions
     ADC0->ULLMEM.CTL1 |= 0x00000100;             // 2) start ADC
     uint32_t volatile delay=ADC1->ULLMEM.STATUS; // 3) time to let ADC start
     while((ADC0->ULLMEM.STATUS&0x01)==0x01){}    // 4) wait for completion
-    horizontal = ADC0->ULLMEM.MEMRES[0];         // horizontal value
+    horizontal = ADC0->ULLMEM.MEMRES[0];         // horizontal value passed to input
     vertical = ADC0->ULLMEM.MEMRES[1];           // vertical value
 
 }

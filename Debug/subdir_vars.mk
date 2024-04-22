@@ -18,7 +18,9 @@ C:/Users/ydsoo/OneDrive/Desktop/code\ projs/MSPM0_ValvanoWare/inc/SlidePot.cpp \
 ../Sound.cpp \
 ../Switch.cpp \
 C:/Users/ydsoo/OneDrive/Desktop/code\ projs/MSPM0_ValvanoWare/inc/TExaS.cpp \
-C:/Users/ydsoo/OneDrive/Desktop/code\ projs/MSPM0_ValvanoWare/inc/Timer.cpp 
+C:/Users/ydsoo/OneDrive/Desktop/code\ projs/MSPM0_ValvanoWare/inc/Timer.cpp \
+../buttonhover.cpp \
+../joystick.cpp 
 
 CMD_SRCS += \
 ../mspm0g3507.cmd 
@@ -36,7 +38,9 @@ OBJS += \
 ./Sound.o \
 ./Switch.o \
 ./TExaS.o \
-./Timer.o 
+./Timer.o \
+./buttonhover.o \
+./joystick.o 
 
 CPP_DEPS += \
 ./Clock.d \
@@ -51,7 +55,9 @@ CPP_DEPS += \
 ./Sound.d \
 ./Switch.d \
 ./TExaS.d \
-./Timer.d 
+./Timer.d \
+./buttonhover.d \
+./joystick.d 
 
 OBJS__QUOTED += \
 "Clock.o" \
@@ -66,7 +72,9 @@ OBJS__QUOTED += \
 "Sound.o" \
 "Switch.o" \
 "TExaS.o" \
-"Timer.o" 
+"Timer.o" \
+"buttonhover.o" \
+"joystick.o" 
 
 CPP_DEPS__QUOTED += \
 "Clock.d" \
@@ -81,7 +89,9 @@ CPP_DEPS__QUOTED += \
 "Sound.d" \
 "Switch.d" \
 "TExaS.d" \
-"Timer.d" 
+"Timer.d" \
+"buttonhover.d" \
+"joystick.d" 
 
 CPP_SRCS__QUOTED += \
 "C:/Users/ydsoo/OneDrive/Desktop/code projs/MSPM0_ValvanoWare/inc/Clock.cpp" \
@@ -96,6 +106,8 @@ CPP_SRCS__QUOTED += \
 "../Sound.cpp" \
 "../Switch.cpp" \
 "C:/Users/ydsoo/OneDrive/Desktop/code projs/MSPM0_ValvanoWare/inc/TExaS.cpp" \
-"C:/Users/ydsoo/OneDrive/Desktop/code projs/MSPM0_ValvanoWare/inc/Timer.cpp" 
+"C:/Users/ydsoo/OneDrive/Desktop/code projs/MSPM0_ValvanoWare/inc/Timer.cpp" \
+"../buttonhover.cpp" \
+"../joystick.cpp" 
 
 
