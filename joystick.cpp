@@ -7,6 +7,9 @@
 
 // horizontal pin: PA26
 // vertical pin: PA27
+
+// slidepot pin : PB18
+
 // initializa ADC0, with channel 0 and 1 (PA26, PA27)
 
 #include "joystick.h"
@@ -30,7 +33,7 @@ void ADC_INIT(void) {
 
 }
 
-// pass two reference values
+// pass two reference values ( for joystick )
 
 /*
 void ADC_INPUT(int *horizontal, int *vertical) {
@@ -51,5 +54,30 @@ void Slidepot_Input(int *value) {
     uint32_t volatile delay=ADC1->ULLMEM.STATUS; // 3) time to let ADC start
     while((ADC0->ULLMEM.STATUS&0x01)==0x01){}    // 4) wait for completion
     *value = ADC0->ULLEMEM.MEMRES[0]
+}
+
+
+// return a value from the slide pot based on how many choices you want to give
+// for example, if we want to have 4 different options that we can select, the slidepot will be divided into four different sections out of 4096
+// 0 - 1023, 1024 - 2047, 2048 - 3071, 3071 - 4096. Whichever section the ADC returns will be the number returned (in this case, 0-3)
+int Slidepot_Option(int number_of_options) {
+
+    ADC1->ULLMEM.CTL0 |= 0x00000001;             // 1) enable conversions
+    ADC1->ULLMEM.CTL1 |= 0x00000100;             // 2) start ADC
+    uint32_t volatile delay=ADC1->ULLMEM.STATUS; // 3) time to let ADC start
+    while((ADC0->ULLMEM.STATUS&0x01)==0x01){}    // 4) wait for completion
+    int a = ADC0->ULLEMEM.MEMRES[0]; // a is a value from 0 - 4096
+
+    int segment = 4096 / number_of_options;
+
+    int result = 0;
+
+    while (a < segment) {
+        result++;
+        segment += segment;
+    }
+
+    return segment;
+
 }
 
