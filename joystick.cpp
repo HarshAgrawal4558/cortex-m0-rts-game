@@ -72,7 +72,8 @@ int Slidepot_Option(int number_of_options) {
 
     int result = 0;
 
-    while (a < segment) {
+    // find the segment that a is in.
+    while (a > segment) {
         result++;
         segment += segment;
     }
