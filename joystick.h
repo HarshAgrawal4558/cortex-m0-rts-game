@@ -15,4 +15,8 @@ void ADC_INIT(void);
 // records the ADC input for joystick and writes it to two references
 void ADC_INPUT(int &horizontal, int &vertical);
 
+int SlidePot_Option(int number_of_options);
+
+void SlidePot_Output(int *value);
+
 #endif /* JOYSTICK_H_ */

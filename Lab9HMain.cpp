@@ -20,6 +20,7 @@
 #include "Sound.h"
 #include "buttonhover.h"
 #include "images/images.h"
+#include "joystick.h"
 
 #include "state.h"
 
@@ -237,37 +238,30 @@ int main5(void){ // final main
 }
 
 
-
-uint32_t Count = 0;
-
-void GROUP1_IRQHandler(void){
-    Count++; // number of touches
-    GPIOB->DOUTTGL31_0 = RED; // toggle PB26
-    GPIOB->CPU_INT.ICLR = 0x00200000;   // clear bit 21
-}
-
-
-int main(void){ // final main
+int main(void){ // test the slidepot
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
-  ST7735_InitPrintf();
-    //note: if you colors are weird, see different options for
-    // ST7735_InitR(INITR_REDTAB); inside ST7735_InitPrintf()
-  ST7735_FillScreen(ST7735_BLACK);
   Sensor.Init(); // PB18 = ADC1 channel 5, slidepot
   Switch_Init(); // initialize switches
   LED_Init();    // initialize LED
   Sound_Init();  // initialize sound
+  ADC_INIT();
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
     // initialize interrupts on TimerG12 at 30 Hz
   TimerG12_IntArm(80000000/30,2);
   // initialize all data structures
   __enable_irq();
 
-  ButtonHover();
+  int value = 0;
+  int raw = 0;
+  while(1){
 
-  while(1){}
+      value = SlidePot_Option(4);
+
+      //SlidePot_Output(&raw);
+
+  }
 
        // update ST7735R
     // check for end game or level switch
