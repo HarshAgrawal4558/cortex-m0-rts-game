@@ -21,6 +21,7 @@
 #include "buttonhover.h"
 #include "images/images.h"
 #include "joystick.h"
+#include "animations.h"
 
 #include "state.h"
 
@@ -238,7 +239,7 @@ int main5(void){ // final main
 }
 
 
-int main(void){ // test the slidepot
+int mainslidetest(void){ // test the slidepot
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
@@ -267,3 +268,15 @@ int main(void){ // test the slidepot
     // check for end game or level switch
   }
 
+
+int main(void) {
+    PLL_Init(); // set bus speed
+    LaunchPad_Init();
+    ST7735_InitPrintf();
+    //DrawHit(50, 100);
+    //DrawHeal(0,0);
+    ST7735_FillScreen(ST7735_BLACK);
+    DrawAttack(50,50);
+
+    while(1) {}
+}
