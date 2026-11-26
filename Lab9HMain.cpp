@@ -15,45 +15,41 @@
 #include "../inc/SlidePot.h"
 #include "../inc/DAC5.h"
 #include "SmallFont.h"
-#include "LED.h"
-#include "Switch.h"
-#include "Sound.h"
+#include "Switches/Switch.h"
+#include "sounds/Sound.h"
 #include "images/images.h"
+#include "joystick.h"
+#include "images/Pokemon.h"
+#include "StateMachine.h"
+
 extern "C" void __disable_irq(void);
 extern "C" void __enable_irq(void);
 extern "C" void TIMG12_IRQHandler(void);
-// ****note to ECE319K students****
-// the data sheet says the ADC does not work when clock is 80 MHz
-// however, the ADC seems to work on my boards at 80 MHz
-// I suggest you try 80MHz, but if it doesn't work, switch to 40MHz
 void PLL_Init(void){ // set phase lock loop (PLL)
   // Clock_Init40MHz(); // run this line for 40MHz
   Clock_Init80MHz(0);   // run this line for 80MHz
 }
 
-uint32_t M=1;
-uint32_t Random32(void){
-  M = 1664525*M+1013904223;
-  return M;
-}
-uint32_t Random(uint32_t n){
-  return (Random32()>>16)%n;
-}
-
 SlidePot Sensor(1500,0); // copy calibration from Lab 7
 
 // games  engine runs at 30Hz
+uint32_t inputflag = 0;
+uint32_t buttoninput = 0;
+uint32_t y; //joystick vertical
+extern uint32_t state;
 void TIMG12_IRQHandler(void){uint32_t pos,msg;
   if((TIMG12->CPU_INT.IIDX) == 1){ // this will acknowledge
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
-// game engine goes here
-    // 1) sample slide pot
-    // 2) read input switches
-    // 3) move sprites
-    // 4) start sounds
-    // 5) set semaphore
-    // NO LCD OUTPUT IN INTERRUPT SERVICE ROUTINES
+//game engine
+    y = SlidePot_Option(2);
+    if(Switch_In() != buttoninput){
+        buttoninput = Switch_In();
+    }
+    else{
+        buttoninput = 0;
+    }
+    inputflag = 1;
     GPIOB->DOUTTGL31_0 = GREEN; // toggle PB27 (minimally intrusive debugging)
   }
 }
@@ -82,7 +78,7 @@ const char *Phrases[3][4]={
   {Language_English,Language_Spanish,Language_Portuguese,Language_French}
 };
 // use main1 to observe special characters
-int main(void){ // main1
+int main1(void){ // main1
     char l;
   __disable_irq();
   PLL_Init(); // set bus speed
@@ -125,17 +121,8 @@ int main2(void){ // main2
     //note: if you colors are weird, see different options for
     // ST7735_InitR(INITR_REDTAB); inside ST7735_InitPrintf()
   ST7735_FillScreen(ST7735_BLACK);
-  ST7735_DrawBitmap(22, 159, PlayerShip0, 18,8); // player ship bottom
-  ST7735_DrawBitmap(53, 151, Bunker0, 18,5);
-  ST7735_DrawBitmap(42, 159, PlayerShip1, 18,8); // player ship bottom
-  ST7735_DrawBitmap(62, 159, PlayerShip2, 18,8); // player ship bottom
-  ST7735_DrawBitmap(82, 159, PlayerShip3, 18,8); // player ship bottom
-  ST7735_DrawBitmap(0, 9, SmallEnemy10pointA, 16,10);
-  ST7735_DrawBitmap(20,9, SmallEnemy10pointB, 16,10);
-  ST7735_DrawBitmap(40, 9, SmallEnemy20pointA, 16,10);
-  ST7735_DrawBitmap(60, 9, SmallEnemy20pointB, 16,10);
-  ST7735_DrawBitmap(80, 9, SmallEnemy30pointA, 16,10);
-
+  ST7735_DrawBitmap(0, 159, Start, 128,160); // player ship bottom
+  ST7735_DrawBitmap(50, 100, Venasaur, 50,50);
   for(uint32_t t=500;t>0;t=t-5){
     SmallFont_OutVertical(t,104,6); // top left
     Clock_Delay1ms(50);              // delay 50 msec
@@ -153,68 +140,65 @@ int main2(void){ // main2
   }
 }
 
-// use main3 to test switches and LEDs
-int main3(void){ // main3
-  __disable_irq();
-  PLL_Init(); // set bus speed
-  LaunchPad_Init();
-  Switch_Init(); // initialize switches
-  LED_Init(); // initialize LED
-  while(1){
-    // write code to test switches and LEDs
-   
-  }
-}
 // use main4 to test sound outputs
+extern uint8_t BattleStart_Flag;
+extern uint8_t CursorA_Flag;
+extern uint8_t Attack_Sound_Flag;
+extern uint8_t Heal_Sound_Flag;
 int main4(void){ uint32_t last=0,now;
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
   Switch_Init(); // initialize switches
-  LED_Init(); // initialize LED
   Sound_Init();  // initialize sound
   TExaS_Init(ADC0,6,0); // ADC1 channel 6 is PB20, TExaS scope
   __enable_irq();
   while(1){
     now = Switch_In(); // one of your buttons
-    if((last == 0)&&(now == 1)){
-      Sound_Shoot(); // call one of your sounds
+    if(now == 2){
+      Attack_Sound_Flag = 1;
+      Sound_Start(7000);
     }
-    if((last == 0)&&(now == 2)){
-      Sound_Killed(); // call one of your sounds
-    }
-    if((last == 0)&&(now == 4)){
-      Sound_Explosion(); // call one of your sounds
-    }
-    if((last == 0)&&(now == 8)){
-      Sound_Fastinvader1(); // call one of your sounds
+    else if (now == 4){
+      Heal_Sound_Flag = 1;
+      Sound_Start(7000); //7255
     }
     // modify this to test all your sounds
   }
 }
-// ALL ST7735 OUTPUT MUST OCCUR IN MAIN
-int main5(void){ // final main
+//            ST7735_FillRect(2, 121, 61, 33, ST7735_LIGHTGREY); // vertical boxes
+//            ST7735_FillRect(64, 121, 62, 33, ST7735_LIGHTGREY); // vertical boxes
+//menu text
+//            if(language == 0){ //english
+//                ST7735_DrawStringNew3(1, 13, (dialogue[2][language]), 10 ,ST7735_BLACK, ST7735_LIGHTGREY, 1);
+//                ST7735_DrawStringNew3(1, 14, (dialogue[2][language] + 10), 10 ,ST7735_BLACK, ST7735_LIGHTGREY, 1);
+//            }
+//            else{ //spanish
+//                ST7735_DrawStringNew3(1, 13, (dialogue[2][language]), 9 ,ST7735_BLACK, ST7735_LIGHTGREY, 1);
+//                ST7735_DrawStringNew3(1, 14, (dialogue[2][language] + 9), 10 ,ST7735_BLACK, ST7735_LIGHTGREY, 1);
+//            }
+//move selection
+//            ST7735_DrawStringNew3(11, 13, (dialogue[0][language]), 11  ,ST7735_BLACK, ST7735_LIGHTGREY, 1);
+//            ST7735_DrawStringNew3(11, 14, (dialogue[1][language]), 11 ,ST7735_BLACK, ST7735_LIGHTGREY, 1);
+int main(void){ // final main
   __disable_irq();
   PLL_Init(); // set bus speed
   LaunchPad_Init();
   ST7735_InitPrintf();
-    //note: if you colors are weird, see different options for
-    // ST7735_InitR(INITR_REDTAB); inside ST7735_InitPrintf()
   ST7735_FillScreen(ST7735_BLACK);
   Sensor.Init(); // PB18 = ADC1 channel 5, slidepot
   Switch_Init(); // initialize switches
-  LED_Init();    // initialize LED
   Sound_Init();  // initialize sound
   TExaS_Init(0,0,&TExaS_LaunchPadLogicPB27PB26); // PB27 and PB26
     // initialize interrupts on TimerG12 at 30 Hz
   TimerG12_IntArm(80000000/30,2);
-  // initialize all data structures
   __enable_irq();
-
+  ST7735_FillScreen(ST7735_BLACK);
+  ST7735_DrawBitmap(0, 159, Start, 128,160); //draws start screen
   while(1){
-    // wait for semaphore
-       // clear semaphore
-       // update ST7735R
-    // check for end game or level switch
+      if(inputflag == 1){
+          inputflag = 0;
+          State_Machine(buttoninput, y);
+      }
   }
 }
