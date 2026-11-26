@@ -48,14 +48,6 @@ cortex-m0-rts-game/
 - `<Toolchain, e.g. Code Composer Studio>`
 - `<Programmer / debugger>`
 
-### Build and Flash
-
-```bash
-cd firmware
-make
-make flash
-```
-
 ### Multiplayer Setup
 
 1. Flash the firmware onto two or more boards.
